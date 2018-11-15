@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-4.1.xsd 
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx.xsd" 
+	xmlns:tx="http://www.springframework.org/schema/tx">
+
+
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver">
+		</property>
+		<property name="url" value="jdbc:mysql://localhost:3306/news"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="123456"></property>
+	</bean>
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQLDialect
+				</prop>
+				<prop key="hibernate.show_sql">
+					true
+				</prop>
+			</props>
+		</property>
+		<property name="mappingResources">
+			<list>
+				<value>com/news/entity/Admin.hbm.xml</value>
+				<value>com/news/entity/Topic.hbm.xml</value>
+				<value>com/news/entity/Newsinfo.hbm.xml</value>
+				<value>com/news/entity/Users.hbm.xml</value>
+				<value>com/news/entity/Comment.hbm.xml</value></list>
+		</property></bean>
+        <!-- newsinfoDao -->
+        <bean id="newsinfoDao" class="com.news.dao.impl.NewsinfoDaoImpl">
+        <property name="sessionFactory" ref="sessionFactory"></property>
+        </bean>
+		<!-- newsinfoBiz -->
+		<bean id="newsinfoBiz" class="com.news.biz.impl.NewsinfoBizImpl">
+		<property name="newsinfoDao" ref="newsinfoDao"></property>
+		</bean>
+		<!-- topicDao -->
+		<bean id="topicDao" class="com.news.dao.impl.TopicDaoImpl">
+        <property name="sessionFactory" ref="sessionFactory"></property>
+        </bean>
+		<!-- topicBiz -->
+		<bean id="topicBiz" class="com.news.biz.impl.TopicBizImpl">
+		<property name="topicDao" ref="topicDao"></property>
+		</bean>
+		<!-- action -->
+		<bean id="newsinfoAction" 
+		class="com.news.action.NewsinfoAction" scope="prototype">
+		<property name="newsinfoBiz" ref="newsinfoBiz"></property>
+		<property name="topicBiz" ref="topicBiz"></property>
+		</bean>
+		
+		<!-- adminDao -->
+		<bean id="adminDao" class="com.news.dao.impl.AdminDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+		</bean>
+		<!-- adminBiz -->
+		<bean id="adminBiz" class="com.news.biz.impl.AdminBizImpl">
+		<property name="adminDao" ref="adminDao"></property>
+		</bean>
+		<!-- action -->
+		<bean id="adminAction" class="com.news.action.AdminAction" 
+		scope="prototype">
+		<property name="adminBiz" ref="adminBiz"></property>
+		<property name="newsinfoBiz" ref="newsinfoBiz"></property>
+		<property name="topicBiz" ref="topicBiz"></property>
+		</bean>
+		
+		
+		<bean id="topicAction" class="com.news.action.TopicAction" 
+		scope="prototype">
+		<property name="topicBiz" ref="topicBiz"></property>
+		</bean>
+		
+	<!-- 事务管理器 -->	
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- 定义事务通知 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+	<tx:attributes>
+	<tx:method name="get*" propagation="REQUIRED" read-only="true"/>
+	<tx:method name="*" propagation="REQUIRED"/>
+	</tx:attributes>
+	</tx:advice>
+	<!-- 定义切面 -->
+	<aop:config>
+	<aop:pointcut 
+	expression="execution(* com.news.biz.*.*(..))" id="bizMethods"/>
+	<aop:advisor advice-ref="txAdvice" pointcut-ref="bizMethods"/>
+	</aop:config>
+	<tx:annotation-driven transaction-manager="transactionManager" /></beans>

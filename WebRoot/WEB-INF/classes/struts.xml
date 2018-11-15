@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+<package name="news" namespace="/" extends="struts-default">
+<action name="index" class="newsinfoAction" method="index">
+<result name="index">/index.jsp</result>
+</action>
+
+<action name="newsread" class="newsinfoAction" method="newsread">
+<result name="news_read">/news_read.jsp</result>
+</action>
+
+<action name="indexsidebar" class="newsinfoAction" method="indexsidebar">
+<result name="index_sidebar">/index-elements/index_sidebar.jsp</result>
+</action>
+<action name="validateLogin" class="adminAction" method="validateLogin">
+<result name="index" type="redirectAction">index</result>
+</action>
+<action name="admin" class="adminAction" method="admin">
+<result name="admin" >/newspages/admin.jsp</result>
+</action>
+<action name="deleteNews" class="adminAction" method="deleteNews">
+<result name="admin"  type="redirectAction">admin</result>
+</action>
+<action name="toNewsAdd" class="adminAction" method="toNewsAdd">
+<result name="news_add">/newspages/news_add.jsp</result>
+</action>
+<action name="doNewsAdd" class="adminAction" method="doNewsAdd">
+<result name="admin" type="redirectAction">admin</result>
+</action>
+<action name="toModifyNews" class="adminAction" method="toModifyNews">
+<result name="news_modify">/newspages/news_modify.jsp</result>
+</action>
+<action name="doNewsModify" class="adminAction" method="doNewsModify">
+<result name="admin" type="redirectAction">admin</result>
+</action>
+
+<action name="topiclist" class="topicAction" method="topiclist">
+<result name="topic_list">/newspages/topic_list.jsp</result>
+</action>
+
+<action name="deleteTopic" class="topicAction" method="deleteTopic">
+<result name="topic_list" type="redirectAction">topiclist</result>
+</action>
+<action name="addTopic" class="topicAction" method="addTopic">
+<result name="topic_list" type="redirectAction">topiclist</result>
+</action>
+<action name="toModifyTopic" class="topicAction" method="toModifyTopic">
+<result name="topic_modify">/newspages/topic_modify.jsp</result>
+</action>
+<action name="doTopicModify" class="topicAction" method="doTopicModify">
+<result name="topic_list" type="redirectAction">topiclist</result>
+</action>
+</package>
+</struts>    
